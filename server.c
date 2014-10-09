@@ -6,13 +6,24 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-/*Function prototype*/
-void echoMessage(int);
-
 void error(const char *msg)
 {
     perror(msg);
     exit(1);
+}
+
+/*Reads in the buffer, echos and returns confimation message*/
+void echoMessage(int sock)
+{
+   int n;
+   char buffer[256];
+      
+   bzero(buffer,256);
+   n = read(sock,buffer,255);
+   if (n < 0) error("ERROR reading from socket");
+   printf("Here is the message: %s\n",buffer);
+   n = write(sock,"I got your message",18);
+   if (n < 0) error("ERROR writing to socket");
 }
 
 int main(int argc, char *argv[])
@@ -56,22 +67,4 @@ int main(int argc, char *argv[])
      } /* end of while */
      close(sockfd);
      return 0; 
-}
-
-/******** DOSTUFF() *********************
- There is a separate instance of this function 
- for each connection.  It handles all communication
- once a connnection has been established.
- *****************************************/
-void echoMessage(int sock)
-{
-   int n;
-   char buffer[256];
-      
-   bzero(buffer,256);
-   n = read(sock,buffer,255);
-   if (n < 0) error("ERROR reading from socket");
-   printf("Here is the message: %s\n",buffer);
-   n = write(sock,"I got your message",18);
-   if (n < 0) error("ERROR writing to socket");
 }
